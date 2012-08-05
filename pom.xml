@@ -3,4 +3,12 @@
   <groupId>com.springyweb.simulator</groupId>
   <artifactId>simple-examples</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>com.springyweb</groupId>
+		<artifactId>ai-game-simulator</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>
