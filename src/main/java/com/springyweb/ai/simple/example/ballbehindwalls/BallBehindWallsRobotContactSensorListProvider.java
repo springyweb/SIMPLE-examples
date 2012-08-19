@@ -7,7 +7,7 @@ import com.springyweb.ai.simple.model.robot.sensor.RayPointConfig;
 import com.springyweb.ai.simple.model.robot.sensor.SonarSensorSegment;
 import com.springyweb.ai.simple.model.robot.sensor.SonarSensorSegmentListProvider;
 
-public class BallBehindWallsRobotSensorListProvider implements SonarSensorSegmentListProvider {
+public class BallBehindWallsRobotContactSensorListProvider implements SonarSensorSegmentListProvider {
 	
 	private static final float SONAR_SENSOR_RAY_LENGTH = 1f;
 	
