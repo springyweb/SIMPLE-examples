@@ -36,7 +36,7 @@ public class BallBehindWallsModule extends AbstractInitializingRobotModule {
 	private static final String NAMED_INIT_POSITION_Y = "initPositionY";
 	
 	public static final int NETWORK_INPUT_NEURON_COUNT = 23;
-	public static final int NETWORK_OUTPUT_NEURON_COUNT = 34;
+	public static final int NETWORK_OUTPUT_NEURON_COUNT = 2;
 	private static final int NETWORK_HIDDEN_LAYER_COUNT = 3;
 	
 	private static final String NAMED_BALL_RADIUS = "ballRadius";
