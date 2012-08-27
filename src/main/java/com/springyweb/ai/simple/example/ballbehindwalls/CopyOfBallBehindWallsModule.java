@@ -1,36 +1,11 @@
 package com.springyweb.ai.simple.example.ballbehindwalls;
 
-import org.encog.engine.network.activation.ActivationBiPolar;
-import org.encog.engine.network.activation.ActivationTANH;
-import org.encog.neural.networks.BasicNetwork;
-import org.encog.neural.pattern.FeedForwardPattern;
-import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.World;
 
-import com.google.inject.Key;
-import com.google.inject.PrivateModule;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
-import com.mycila.inject.jsr250.Jsr250Injector;
-import com.springyweb.ai.simple.model.ActorDefinition;
-import com.springyweb.ai.simple.model.collectable.Ball;
-import com.springyweb.ai.simple.model.inactive.Wall;
-import com.springyweb.ai.simple.model.robot.BasicTwoWheelDrive;
-import com.springyweb.ai.simple.model.robot.Drive;
-import com.springyweb.ai.simple.model.robot.RobotController;
-import com.springyweb.ai.simple.model.robot.RobotScorer;
-import com.springyweb.ai.simple.model.robot.TwoWheeledRobot;
-import com.springyweb.ai.simple.model.robot.sensor.BasicSensorBank;
-import com.springyweb.ai.simple.model.robot.sensor.ContactSensor;
-import com.springyweb.ai.simple.model.robot.sensor.ContactSensorRing;
-import com.springyweb.ai.simple.model.robot.sensor.SensorBank;
-import com.springyweb.ai.simple.model.robot.sensor.SensorRing;
-import com.springyweb.ai.simple.module.AbstractInitializingTwoWheeledRobotModule;
-
-public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotModule {
+public class CopyOfBallBehindWallsModule  {
 	
+	/**
 	private static final String NAMED_ID = "id";
+	private static final String NAMED_DENSITY = "density";
 	private static final String NAMED_INIT_POSITION_X = "initPositionX";
 	private static final String NAMED_INIT_POSITION_Y = "initPositionY";
 	
@@ -69,27 +44,40 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 	private static final float WALL2_HEIGHT = 2f;
 	private static final float WALL2_WIDTH = 0.5f;
 	
+	private static final String NAMED_GROUND_LENGTH = "groundLength";
+	private static final float GROUND_INIT_POSITION_X = 0f;
+	private static final float GROUND_INIT_POSITION_Y = 0f;
 	private static final float GROUND_LENGTH = 10f;
 	
 	private static final String NAMED_CONTACT_SENSOR_COUNT = "contactSensorCount";
 	private static final int CONTACT_SENSOR_COUNT = 4;
 	
-	public BallBehindWallsModule(World world) {
+	public CopyOfBallBehindWallsModule(World world) {
 		super(world);
 	}
 	
 	@Override
-	public void configure() {
-		System.out.println("Configure");
-		super.configure();
-	}
-	
-	@Override
-	public void configureModule() {
+	protected void configure() {
+		bindConstant().annotatedWith(Names.named(NAMED_DENSITY)).to(1f);
+		configureGround();
 		configureWalls();
 		configureContactSensors();
         configureRobots();
         configureBall();
+	}
+
+	private void configureGround() {
+		install(new PrivateModule() {		
+			@Override
+			protected void configure() {
+				bind(Ground.class);
+		        expose(Ground.class);
+				bindConstant().annotatedWith(Names.named(NAMED_INIT_POSITION_X)).to(GROUND_INIT_POSITION_X);
+		        bindConstant().annotatedWith(Names.named(NAMED_INIT_POSITION_Y)).to(GROUND_INIT_POSITION_Y);
+		        bindConstant().annotatedWith(Names.named(NAMED_GROUND_LENGTH)).to(GROUND_LENGTH);
+		        
+			}
+		});
 	}
 	
 	private void configureWalls() {
@@ -135,7 +123,7 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 			protected void configure() {
 				bind(TwoWheeledRobot.class).annotatedWith(Names.named(ROBOT1_NAME)).to(TwoWheeledRobot.class);
 		        expose(TwoWheeledRobot.class).annotatedWith(Names.named(ROBOT1_NAME));
-		        //bind(new TypeLiteral<List<SonarSensorSegment>>(){}).toProvider(new BallBehindWallsRobotSensorListProvider());
+		        bind(new TypeLiteral<List<SonarSensorSegment>>(){}).toProvider(new BallBehindWallsRobotSensorListProvider());
 		        bindConstant().annotatedWith(Names.named(NAMED_INIT_POSITION_X)).to(ROBOT1_INIT_POSITION_X);
 		        bindConstant().annotatedWith(Names.named(NAMED_INIT_POSITION_Y)).to(ROBOT1_INIT_POSITION_Y);
 		        bindConstant().annotatedWith(Names.named(NAMED_ROBOT_RADIUS)).to(ROBOT1_RADIUS);
@@ -172,42 +160,20 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 		network.reset();
 		return network;
 	}
+	
+	@Provides TwoWheelMotor provideMotor() {
+		return new BasicTwoWheelMotor();
+	}
 
 	@Override
-	public void injectModuleInstances(Jsr250Injector injector) {
+	public TwoWheeledRobot init() {
+		Jsr250Injector injector = getInjector();
 		injector.getInstance(BallBehindWallsEventSubscriber.class);
+		injector.getInstance(Ground.class);
 		injector.getInstance(Ball.class);
 		injector.getInstance(Key.get(Wall.class, Names.named(WALL1_NAME)));
 		injector.getInstance(Key.get(Wall.class, Names.named(WALL2_NAME)));
+	    return injector.getInstance(Key.get(TwoWheeledRobot.class, Names.named(ROBOT1_NAME)));
 	}
-
-	@Override
-	public Drive provideDrive() {
-		return new BasicTwoWheelDrive();
-	}
-
-	@Override
-	public float provideGroundLength() {
-		return GROUND_LENGTH;
-	}
-
-	@Override
-	public Class<? extends RobotController> provideRobotControllerClass() {
-		return BallBehindWallsRobotController.class;
-	}
-
-	@Override
-	public ActorDefinition provideRobotDefinition() {
-		return new ActorDefinition(new Vec2(ROBOT1_INIT_POSITION_X, ROBOT1_INIT_POSITION_Y), ROBOT1_RADIUS, ROBOT1_INIT_ANGLE);
-	}
-
-	@Override
-	public Class<? extends RobotScorer> provideRobotScorerClass() {
-		return BallBehindWallsRobotScorer.class;
-	}
-
-	@Override
-	public Class<? extends SensorBank> provideSensorBankClass() {
-		return BasicSensorBank.class;
-	}
+	*/
 }

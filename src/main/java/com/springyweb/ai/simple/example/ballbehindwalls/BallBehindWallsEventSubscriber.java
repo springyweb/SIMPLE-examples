@@ -10,8 +10,9 @@ import com.springyweb.ai.simple.model.robot.ItemCollectedEvent;
 import com.springyweb.ai.simple.model.robot.PostRobotInitialisedEvent;
 import com.springyweb.ai.simple.model.robot.PostRobotUpdateEvent;
 import com.springyweb.ai.simple.model.robot.PreRobotUpdateEvent;
-import com.springyweb.ai.simple.model.robot.Robot;
+import com.springyweb.ai.simple.model.robot.TrainableRobot;
 import com.springyweb.ai.simple.model.robot.RobotCollisionEvent;
+import com.springyweb.ai.simple.model.robot.TwoWheelDrive;
 import com.springyweb.ai.simple.model.robot.TwoWheeledRobot;
 
 public class BallBehindWallsEventSubscriber extends AbstractRobotEventSubscriber {
@@ -38,15 +39,17 @@ public class BallBehindWallsEventSubscriber extends AbstractRobotEventSubscriber
 	
 	@Subscribe
     public void handlePreRobotUpdateEvent(PreRobotUpdateEvent preRobotUpdateEvent) {
-		Robot robot = preRobotUpdateEvent.getRobot();
-		leftWheelSpeed = robot.getLeftWheelSpeed();
-		rightWheelSpeed = robot.getRightWheelSpeed();
+		TrainableRobot robot = preRobotUpdateEvent.getRobot();
+		TwoWheelDrive drive = (TwoWheelDrive)robot.getRobotController().getDrive();
+		leftWheelSpeed = drive.getLeftWheelSpeed();
+		rightWheelSpeed = drive.getRightWheelSpeed();
     }
 	
 	@Subscribe
     public void handlePostRobotUpdateEvent(PostRobotUpdateEvent postRobotUpdateEvent) {
-		Robot robot = postRobotUpdateEvent.getRobot();
-		if(leftWheelSpeed > 0 && leftWheelSpeed == rightWheelSpeed && leftWheelSpeed==robot.getLeftWheelSpeed() && rightWheelSpeed == robot.getRightWheelSpeed()) {
+		TrainableRobot robot = postRobotUpdateEvent.getRobot();
+		TwoWheelDrive drive = (TwoWheelDrive)robot.getRobotController().getDrive();
+		if(leftWheelSpeed > 0 && leftWheelSpeed == rightWheelSpeed && leftWheelSpeed==drive.getLeftWheelSpeed() && rightWheelSpeed == drive.getRightWheelSpeed()) {
 			Long straightForwardTime = (Long)robot.getMetadataValue(BallBehindWallsMetaData.ROBOT_STRAIGHT_FORWARD_TIME);
 			if(straightForwardTime < Long.MAX_VALUE) {
 				straightForwardTime = straightForwardTime + 1;
@@ -57,7 +60,7 @@ public class BallBehindWallsEventSubscriber extends AbstractRobotEventSubscriber
 	
 	@Subscribe
 	public void handleRobotCollisionEvent(RobotCollisionEvent robotCollisionEvent) {
-		Robot robot = robotCollisionEvent.getRobot();
+		TrainableRobot robot = robotCollisionEvent.getRobot();
 		Long collisions = (Long)robot.getMetadataValue(BallBehindWallsMetaData.ROBOT_COLLISIONS);
 		if(collisions < Long.MAX_VALUE) {
 			collisions = collisions + 1;

@@ -1,12 +1,12 @@
 package com.springyweb.ai.simple.example.ballbehindwalls;
 
-import com.springyweb.ai.simple.model.robot.Robot;
+import com.springyweb.ai.simple.model.robot.TrainableRobot;
 import com.springyweb.ai.simple.model.robot.RobotScorer;
 
 public class BallBehindWallsRobotScorer implements RobotScorer {
 	
 	@Override
-	public double getScore(Robot robot) {
+	public double getScore(TrainableRobot robot) {
 		
 		Double ret = 0d;
 		

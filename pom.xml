@@ -12,8 +12,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.springyweb</groupId>
-			<artifactId>ai-game-simulator</artifactId>
+			<groupId>com.springyweb.ai</groupId>
+			<artifactId>simple</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
