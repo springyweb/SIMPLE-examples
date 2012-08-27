@@ -79,12 +79,6 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 	}
 	
 	@Override
-	public void configure() {
-		System.out.println("Configure");
-		super.configure();
-	}
-	
-	@Override
 	public void configureModule() {
 		configureWalls();
 		configureContactSensors();
