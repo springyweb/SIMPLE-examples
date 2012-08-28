@@ -10,7 +10,6 @@ import org.jbox2d.dynamics.World;
 import com.google.inject.Key;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.mycila.inject.jsr250.Jsr250Injector;
 import com.springyweb.ai.simple.model.ActorDefinition;
@@ -20,12 +19,8 @@ import com.springyweb.ai.simple.model.robot.BasicTwoWheelDrive;
 import com.springyweb.ai.simple.model.robot.Drive;
 import com.springyweb.ai.simple.model.robot.RobotController;
 import com.springyweb.ai.simple.model.robot.RobotScorer;
-import com.springyweb.ai.simple.model.robot.TwoWheeledRobot;
 import com.springyweb.ai.simple.model.robot.sensor.BasicSensorBank;
-import com.springyweb.ai.simple.model.robot.sensor.ContactSensor;
-import com.springyweb.ai.simple.model.robot.sensor.ContactSensorRing;
 import com.springyweb.ai.simple.model.robot.sensor.SensorBank;
-import com.springyweb.ai.simple.model.robot.sensor.SensorRing;
 import com.springyweb.ai.simple.module.AbstractInitializingTwoWheeledRobotModule;
 
 public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotModule {
@@ -44,11 +39,6 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 	private static final float BALL_INIT_POSITION_Y = 5f;
 	private static final float BALL_RADIUS = 0.1f;
 	
-	private static final String NAMED_ROBOT_SCORER = "robotScorer";
-	private static final String NAMED_ROBOT_CONTROLLER = "robotController";
-	private static final String NAMED_INIT_ROBOT_ANGLE = "initRobotAngle";
-	private static final String NAMED_ROBOT_RADIUS = "robotRadius";
-	private static final String ROBOT1_NAME = "Robot1";
 	private static final float ROBOT1_INIT_POSITION_X = 0f;
 	private static final float ROBOT1_INIT_POSITION_Y = 1f;
 	private static final double ROBOT1_INIT_ANGLE = 45d;
@@ -71,9 +61,6 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 	
 	private static final float GROUND_LENGTH = 10f;
 	
-	private static final String NAMED_CONTACT_SENSOR_COUNT = "contactSensorCount";
-	private static final int CONTACT_SENSOR_COUNT = 4;
-	
 	public BallBehindWallsModule(World world) {
 		super(world);
 	}
@@ -81,8 +68,6 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 	@Override
 	public void configureModule() {
 		configureWalls();
-		configureContactSensors();
-        configureRobots();
         configureBall();
 	}
 	
@@ -112,36 +97,7 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 		});
 	}
 	
-	private void configureContactSensors() {
-		install(new PrivateModule() {		
-			@Override
-			protected void configure() {
-				bind(new TypeLiteral<SensorRing<ContactSensor>>(){}).to(ContactSensorRing.class);
-		        expose(new TypeLiteral<SensorRing<ContactSensor>>(){});
-				bindConstant().annotatedWith(Names.named(NAMED_CONTACT_SENSOR_COUNT)).to(CONTACT_SENSOR_COUNT);
-			}
-		});
-	}
-
-	private void configureRobots() {
-		install(new PrivateModule() {
-			@Override
-			protected void configure() {
-				bind(TwoWheeledRobot.class).annotatedWith(Names.named(ROBOT1_NAME)).to(TwoWheeledRobot.class);
-		        expose(TwoWheeledRobot.class).annotatedWith(Names.named(ROBOT1_NAME));
-		        //bind(new TypeLiteral<List<SonarSensorSegment>>(){}).toProvider(new BallBehindWallsRobotSensorListProvider());
-		        bindConstant().annotatedWith(Names.named(NAMED_INIT_POSITION_X)).to(ROBOT1_INIT_POSITION_X);
-		        bindConstant().annotatedWith(Names.named(NAMED_INIT_POSITION_Y)).to(ROBOT1_INIT_POSITION_Y);
-		        bindConstant().annotatedWith(Names.named(NAMED_ROBOT_RADIUS)).to(ROBOT1_RADIUS);
-		        bindConstant().annotatedWith(Names.named(NAMED_INIT_ROBOT_ANGLE)).to(ROBOT1_INIT_ANGLE);
-		        bind(RobotScorer.class).annotatedWith(Names.named(NAMED_ROBOT_SCORER)).to(BallBehindWallsRobotScorer.class);
-		        bind(RobotController.class).annotatedWith(Names.named(NAMED_ROBOT_CONTROLLER)).to(BallBehindWallsRobotController.class);
-		        bindConstant().annotatedWith(Names.named(NAMED_ID)).to(ROBOT1_NAME);
-			}
-		});
-	}
-	
-	private void configureBall() {
+		private void configureBall() {
 		install(new PrivateModule() {		
 			@Override
 			protected void configure() {				

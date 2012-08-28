@@ -53,9 +53,8 @@ public class BallBehindWallsRobotController extends AbstractRobotControllerSense
 
 	@Override
 	public void act(NeuralNetworkOutput networkOutput, Drive drive) {
-		
-		((TwoWheelDrive)drive).setLeftWheelSpeed(0.25f * (float) networkOutput.getNeuronValue(0));
-		((TwoWheelDrive)drive).setRightWheelSpeed(0.25f * (float) networkOutput.getNeuronValue(1));
-		
+		TwoWheelDrive twoWheelDrive = ((TwoWheelDrive)drive);
+		twoWheelDrive.setLeftWheelSpeed(drive.getMaxSpeed() * (float) networkOutput.getNeuronValue(0));
+		twoWheelDrive.setRightWheelSpeed(drive.getMaxSpeed() * (float) networkOutput.getNeuronValue(1));
 	}
 }
