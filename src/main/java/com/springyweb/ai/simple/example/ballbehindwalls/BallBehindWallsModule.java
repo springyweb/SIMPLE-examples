@@ -9,7 +9,6 @@ import org.jbox2d.dynamics.World;
 
 import com.google.inject.Key;
 import com.google.inject.PrivateModule;
-import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.mycila.inject.jsr250.Jsr250Injector;
 import com.springyweb.ai.simple.model.ActorDefinition;
@@ -111,7 +110,8 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 		});
 	}
 	
-	@Provides BasicNetwork provideNetwork() {
+	@Override	
+	public BasicNetwork provideNetwork() {
 		FeedForwardPattern pattern = new FeedForwardPattern();
 		pattern.setInputNeurons(NETWORK_INPUT_NEURON_COUNT);
 		pattern.addHiddenLayer(NETWORK_HIDDEN_LAYER_COUNT);
@@ -129,11 +129,6 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 		injector.getInstance(Ball.class);
 		injector.getInstance(Key.get(Wall.class, Names.named(WALL1_NAME)));
 		injector.getInstance(Key.get(Wall.class, Names.named(WALL2_NAME)));
-	}
-
-	@Override
-	public Drive provideDrive() {
-		return new BasicTwoWheelDrive();
 	}
 
 	@Override
@@ -159,5 +154,10 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 	@Override
 	public Class<? extends SensorBank> provideSensorBankClass() {
 		return BasicSensorBank.class;
+	}
+
+	@Override
+	public Class<? extends Drive> provideDriveClass() {
+		return BasicTwoWheelDrive.class;
 	}
 }
