@@ -9,6 +9,7 @@ import org.jbox2d.dynamics.World;
 
 import com.google.inject.Key;
 import com.google.inject.PrivateModule;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.mycila.inject.jsr250.Jsr250Injector;
 import com.springyweb.ai.simple.model.ActorDefinition;
@@ -19,7 +20,10 @@ import com.springyweb.ai.simple.model.robot.Drive;
 import com.springyweb.ai.simple.model.robot.RobotController;
 import com.springyweb.ai.simple.model.robot.RobotScorer;
 import com.springyweb.ai.simple.model.robot.sensor.BasicSensorBank;
+import com.springyweb.ai.simple.model.robot.sensor.ContactSensor;
+import com.springyweb.ai.simple.model.robot.sensor.ContactSensorRing;
 import com.springyweb.ai.simple.model.robot.sensor.SensorBank;
+import com.springyweb.ai.simple.model.robot.sensor.SensorRing;
 import com.springyweb.ai.simple.module.AbstractInitializingTwoWheeledRobotModule;
 
 public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotModule {
@@ -60,6 +64,9 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 	
 	private static final float GROUND_LENGTH = 10f;
 	
+	private static final String NAMED_CONTACT_SENSOR_COUNT = "contactSensorCount";
+	private static final int CONTACT_SENSOR_COUNT = 4;
+	
 	public BallBehindWallsModule(World world) {
 		super(world);
 	}
@@ -68,6 +75,18 @@ public class BallBehindWallsModule extends AbstractInitializingTwoWheeledRobotMo
 	public void configureModule() {
 		configureWalls();
         configureBall();
+        configureContactSensors();
+	}
+	
+	private void configureContactSensors() {
+		install(new PrivateModule() {		
+			@Override
+			protected void configure() {
+				bind(new TypeLiteral<SensorRing<ContactSensor>>(){}).to(ContactSensorRing.class);
+		        expose(new TypeLiteral<SensorRing<ContactSensor>>(){});
+				bindConstant().annotatedWith(Names.named(NAMED_CONTACT_SENSOR_COUNT)).to(CONTACT_SENSOR_COUNT);
+			}
+		});
 	}
 	
 	private void configureWalls() {
