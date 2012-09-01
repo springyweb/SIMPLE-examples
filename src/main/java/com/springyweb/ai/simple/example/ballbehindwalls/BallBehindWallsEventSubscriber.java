@@ -5,15 +5,15 @@ import org.slf4j.LoggerFactory;
 
 import com.mycila.inject.internal.guava.eventbus.Subscribe;
 import com.springyweb.ai.simple.model.Actor;
-import com.springyweb.ai.simple.model.robot.AbstractRobotEventSubscriber;
-import com.springyweb.ai.simple.model.robot.ItemCollectedEvent;
-import com.springyweb.ai.simple.model.robot.PostRobotInitialisedEvent;
-import com.springyweb.ai.simple.model.robot.PostRobotUpdateEvent;
-import com.springyweb.ai.simple.model.robot.PreRobotUpdateEvent;
 import com.springyweb.ai.simple.model.robot.TrainableRobot;
-import com.springyweb.ai.simple.model.robot.RobotCollisionEvent;
 import com.springyweb.ai.simple.model.robot.TwoWheelDrive;
 import com.springyweb.ai.simple.model.robot.TwoWheeledRobot;
+import com.springyweb.ai.simple.model.robot.event.AbstractRobotEventSubscriber;
+import com.springyweb.ai.simple.model.robot.event.ItemCollectedEvent;
+import com.springyweb.ai.simple.model.robot.event.PostRobotInitialisedEvent;
+import com.springyweb.ai.simple.model.robot.event.PostRobotUpdateEvent;
+import com.springyweb.ai.simple.model.robot.event.PreRobotUpdateEvent;
+import com.springyweb.ai.simple.model.robot.event.RobotCollisionEvent;
 
 public class BallBehindWallsEventSubscriber extends AbstractRobotEventSubscriber {
 	private static final Logger LOG = LoggerFactory.getLogger(BallBehindWallsEventSubscriber.class);
@@ -40,7 +40,7 @@ public class BallBehindWallsEventSubscriber extends AbstractRobotEventSubscriber
 	@Subscribe
     public void handlePreRobotUpdateEvent(PreRobotUpdateEvent preRobotUpdateEvent) {
 		TrainableRobot robot = preRobotUpdateEvent.getRobot();
-		TwoWheelDrive drive = (TwoWheelDrive)robot.getRobotController().getDrive();
+		TwoWheelDrive drive = (TwoWheelDrive)robot.getController().getDrive();
 		leftWheelSpeed = drive.getLeftWheelSpeed();
 		rightWheelSpeed = drive.getRightWheelSpeed();
     }
@@ -48,7 +48,7 @@ public class BallBehindWallsEventSubscriber extends AbstractRobotEventSubscriber
 	@Subscribe
     public void handlePostRobotUpdateEvent(PostRobotUpdateEvent postRobotUpdateEvent) {
 		TrainableRobot robot = postRobotUpdateEvent.getRobot();
-		TwoWheelDrive drive = (TwoWheelDrive)robot.getRobotController().getDrive();
+		TwoWheelDrive drive = (TwoWheelDrive)robot.getController().getDrive();
 		if(leftWheelSpeed > 0 && leftWheelSpeed == rightWheelSpeed && leftWheelSpeed==drive.getLeftWheelSpeed() && rightWheelSpeed == drive.getRightWheelSpeed()) {
 			Long straightForwardTime = (Long)robot.getMetadataValue(BallBehindWallsMetaData.ROBOT_STRAIGHT_FORWARD_TIME);
 			if(straightForwardTime < Long.MAX_VALUE) {
